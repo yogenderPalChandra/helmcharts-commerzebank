@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    route.openshift.io/termination: passthrough
+  name: platform
+  namespace: arcade
+spec:
+  rules:
+    - host: arcade.apps-crc.testing
+      http:
+        paths:
+          - backend:
+              service:
+                name: platform
+                port:
+                  number: 4443
+            pathType: ImplementationSpecific
+            path: ''
+tls:
+  - hosts:
+      - arcade.apps-crc.testing
+    secretName: platform-secret-tls

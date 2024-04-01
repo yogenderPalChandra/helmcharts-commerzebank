@@ -1,0 +1,74 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2024-03-01T12:46:36Z"
+  generation: 1
+  labels:
+    app: platform
+  name: platform
+  namespace: arcade
+  resourceVersion: "443503"
+  uid: 6cd5e5da-e181-42d8-99c8-1b14c461316b
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: platform
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: platform
+    spec:
+      containers:
+      - image: quay.io/mdewald/s3e-platform
+        imagePullPolicy: Always
+        name: s3e-platform
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+          - name: platform-secret-cert
+            mountPath: /etc/nginx/certs
+            readonly: True
+      volumes:
+        - name: platform-secret-cert
+          secret:
+            secretName: platform-secret-tls
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-03-01T12:46:37Z"
+    lastUpdateTime: "2024-03-01T12:46:51Z"
+    message: ReplicaSet "platform-6bffddf6" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2024-03-10T09:05:18Z"
+    lastUpdateTime: "2024-03-10T09:05:18Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

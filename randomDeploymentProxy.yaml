@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      serviceAccountName: proxy
+      containers:
+      - name: oauth-proxy
+        image: quay.io/oauth2-proxy/oauth2-proxy:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8443
+          name: public
+        env: 
+        - name: OAUTH_PROXY_COOKIE_SECRET
+        valueFrom: 
+          secretKeyref: 
+            name: myy-secret
+            key: cookie-secret
+        args:
+        - --https-address=:8443
+        - --provider=openshift
+        - --upstream=http://localhost:8080
+        - --tls-cert-file=/etc/tls/private/tls.crt
+        - --tls-key-file=/etc/tls/private/tls.key
+
+        volumeMounts:
+        - mountPath: /etc/tls/private
+          name: proxy-tls
+        - mountPath: /etc/proxy/secrets
+          name: cookie-secret-proxy
+      - name: app
+        image: quay.io/operatingopenshift/s3e-game:latest
+      volumes:
+      - name: proxy-tls
+        secret:
+        secretName: proxy-tls
+      - name: cookie-secret-proxy
+        secret:
+        secretName:  myy-secret
